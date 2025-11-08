@@ -1,0 +1,31 @@
+[project]
+name = "books_api"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "Yuri Perim", email = "yuriperim@gmail.com"}
+]
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi (>=0.121.0,<0.122.0)",
+    "uvicorn[standard] (>=0.38.0,<0.39.0)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[dependency-groups]
+dev = [
+    "black (>=25.9.0,<26.0.0)",
+    "flake8 (>=7.3.0,<8.0.0)"
+]
+
+[tool.black]
+line-length = 120
+target-version = ["py312"]
+
+[tool.flake8]
+max-line-length = 120
