@@ -1,7 +1,3 @@
-import os
-from pathlib import Path
-from dotenv import load_dotenv
-
 from logging.config import fileConfig
 
 from sqlalchemy import engine_from_config
@@ -9,16 +5,7 @@ from sqlalchemy import pool
 
 from alembic import context
 
-BASE_DIR = Path(__file__).resolve().parents[3]
-load_dotenv(dotenv_path=BASE_DIR.joinpath(".env.development"))
-
-# in production, the variables below are retrieved from actual os environment variables
-db_host = os.getenv("POSTGRES_HOST")
-db_port = os.getenv("POSTGRES_PORT")
-db_name = os.getenv("POSTGRES_DB")
-db_user = os.getenv("POSTGRES_USER")
-db_password = os.getenv("POSTGRES_PASSWORD")
-DATABASE_URL = f"postgresql+psycopg://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}"
+from src.books_api.models.persistent_storage.settings import DATABASE_URL
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
