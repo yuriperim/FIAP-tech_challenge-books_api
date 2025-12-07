@@ -1,10 +1,11 @@
 from sqlalchemy.orm.exc import NoResultFound
 
 from src.books_api.models.persistent_storage.interfaces.db_connection_handler_interface import IDBConnectionHandler
+from src.books_api.models.persistent_storage.interfaces.books_repository_interface import IBooksRepository
 from src.books_api.models.persistent_storage.entities.books import BooksTable
 
 
-class BooksRepository:
+class BooksRepository(IBooksRepository):
     def __init__(self, db_connection: IDBConnectionHandler) -> None:
         self.__db_connection = db_connection
 
