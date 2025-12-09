@@ -3,6 +3,8 @@ import requests
 from requests.exceptions import HTTPError
 from bs4 import BeautifulSoup
 
+from src.books_api.models.persistent_storage.interfaces.books_repository_interface import IBooksRepository
+
 
 BASE_URL = "https://books.toscrape.com"
 
@@ -78,31 +80,40 @@ def transform_books(books_raw: list[dict]) -> list[dict]:
         )
         book_price = float(book_raw["book_price"][2:])
         book_rating = ratings_map.get(book_raw["book_rating"], 0)
-        book_image = f'{BASE_URL}/{book_raw["book_image"][3:]}'
         book_availability = int(
             book_availability_pattern
             .search(book_raw["book_availability"])
             .group("book_availability")
         )
+        book_image = f'{BASE_URL}/{book_raw["book_image"][3:]}'
 
         books_transformed.append({
             "book_id": book_id,
-            "book_title": book_raw["book_title"],
-            "book_price": book_price,
-            "book_rating": book_rating,
-            "book_image": book_image,
-            "book_availability": book_availability,
-            "book_category": book_raw["book_category"],
+            "titulo": book_raw["book_title"],
+            "preco": book_price,
+            "rating": book_rating,
+            "disponibilidade": book_availability,
+            "categoria": book_raw["book_category"],
+            "url_imagem": book_image,
         })
 
     return books_transformed
 
 
-def load_books(books_transformed: list[dict], dry_run: bool = False) -> None:
-    pass
+def load_books(books_repo: IBooksRepository, books_transformed: list[dict], dry_run: bool = False) -> None:
+    if dry_run:
+        pass
+    else:
+        books_repo.insert_books(books_transformed)
 
 
 if __name__ == "__main__":
+    from src.books_api.models.persistent_storage.settings.db_connection_handler import DBConnectionHandler
+    from src.books_api.models.persistent_storage.repositories.books_repository import BooksRepository
+
+    db_connection = DBConnectionHandler()
+    books_repo = BooksRepository(db_connection)
+
     books_raw = extract_books()
     books_transformed = transform_books(books_raw)
-    load_books(books_transformed, dry_run=True)
+    load_books(books_repo, books_transformed, dry_run=False)
