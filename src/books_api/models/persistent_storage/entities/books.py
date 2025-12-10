@@ -7,12 +7,12 @@ class BooksTable(Base):
     __tablename__ = "books"
 
     book_id = Column("book_id", Integer, primary_key=True)
-    titulo = Column("titulo", String(50), nullable=False)
+    titulo = Column("titulo", String(250), nullable=False)
     preco = Column("preco", Numeric(10, 2), nullable=False)
     rating = Column("rating", Integer, nullable=False)
     disponibilidade = Column("disponibilidade", Integer, nullable=False)
     categoria = Column("categoria", String(25), nullable=False)
-    url_imagem = Column("url_imagem", String(), nullable=False)
+    url_imagem = Column("url_imagem", String(100), nullable=False)
 
     def __repr__(self) -> str:
         return f"Book(book_id={self.book_id}, titulo={self.titulo}, categoria={self.categoria})"

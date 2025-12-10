@@ -24,12 +24,12 @@ def upgrade() -> None:
     op.create_table(
         "books",
         sa.Column("book_id", sa.Integer, primary_key=True),
-        sa.Column("titulo", sa.String(50), nullable=False),
+        sa.Column("titulo", sa.String(250), nullable=False),
         sa.Column("preco", sa.Numeric(10, 2), nullable=False),
         sa.Column("rating", sa.Integer, nullable=False),
         sa.Column("disponibilidade", sa.Integer, nullable=False),
         sa.Column("categoria", sa.String(25), nullable=False),
-        sa.Column("url_imagem", sa.String(), nullable=False),
+        sa.Column("url_imagem", sa.String(100), nullable=False),
     )
 
 
