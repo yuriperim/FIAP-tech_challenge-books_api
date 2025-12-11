@@ -16,3 +16,6 @@ class BooksTable(Base):
 
     def __repr__(self) -> str:
         return f"Book(book_id={self.book_id}, titulo={self.titulo}, categoria={self.categoria})"
+
+    def to_dict(self) -> dict:
+        return {col.name: getattr(self, col.name) for col in self.__table__.columns}
