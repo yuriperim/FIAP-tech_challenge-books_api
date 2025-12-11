@@ -25,7 +25,7 @@ async def run_migrations(background_tasks: BackgroundTasks) -> dict:
     return {"message": "Atualização BD iniciada"}
 
 
-@router.post("/scraping/trigger")
+# @router.post("/scraping/trigger")
 async def run_books_etl(
     background_tasks: BackgroundTasks,
     books_repo: BooksRepository = Depends(get_books_repo)
