@@ -6,7 +6,7 @@ from src.books_api.models.persistent_storage.entities.books import BooksTable
 
 class IBooksRepository(ABC):
     @abstractmethod
-    def get_connection(self) -> IDBConnectionHandler:
+    def get_db_connection(self) -> IDBConnectionHandler:
         pass
 
     @abstractmethod

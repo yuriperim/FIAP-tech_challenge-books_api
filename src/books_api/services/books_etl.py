@@ -100,22 +100,16 @@ def transform_books(books_raw: list[dict]) -> list[dict]:
     return books_transformed
 
 
-def load_books(books_repo: IBooksRepository, books_transformed: list[dict], dry_run: bool = False) -> None:
+def load_books(books_repo: IBooksRepository, books_transformed: list[dict], dry_run: bool) -> None:
     if dry_run:
-        conn = books_repo.get_connection()
+        conn = books_repo.get_db_connection()
         if not conn.is_connected():
             raise ConnectionError("Conexão com BD não estabelecida.")
     else:
         books_repo.insert_books(books_transformed)
 
 
-if __name__ == "__main__":
-    from src.books_api.models.persistent_storage.settings.db_connection_handler import DBConnectionHandler
-    from src.books_api.models.persistent_storage.repositories.books_repository import BooksRepository
-
-    db_connection = DBConnectionHandler()
-    books_repo = BooksRepository(db_connection)
-
+def run_etl(books_repo: IBooksRepository, dry_run: bool = False) -> None:
     books_raw = extract_books()
     books_transformed = transform_books(books_raw)
-    load_books(books_repo, books_transformed, dry_run=False)
+    load_books(books_repo, books_transformed, dry_run=dry_run)
