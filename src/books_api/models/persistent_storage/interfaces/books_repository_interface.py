@@ -1,9 +1,14 @@
 from abc import ABC, abstractmethod
 
+from src.books_api.models.persistent_storage.interfaces.db_connection_handler_interface import IDBConnectionHandler
 from src.books_api.models.persistent_storage.entities.books import BooksTable
 
 
 class IBooksRepository(ABC):
+    @abstractmethod
+    def get_connection(self) -> IDBConnectionHandler:
+        pass
+
     @abstractmethod
     def insert_book(
         self,

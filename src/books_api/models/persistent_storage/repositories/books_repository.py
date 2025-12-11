@@ -9,6 +9,9 @@ class BooksRepository(IBooksRepository):
     def __init__(self, db_connection: IDBConnectionHandler) -> None:
         self.__db_connection = db_connection
 
+    def get_connection(self) -> IDBConnectionHandler:
+        return self.__db_connection
+
     def insert_book(
         self,
         book_id: int,

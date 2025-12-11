@@ -102,7 +102,9 @@ def transform_books(books_raw: list[dict]) -> list[dict]:
 
 def load_books(books_repo: IBooksRepository, books_transformed: list[dict], dry_run: bool = False) -> None:
     if dry_run:
-        pass
+        conn = books_repo.get_connection()
+        if not conn.is_connected():
+            raise ConnectionError("Conexão com BD não estabelecida.")
     else:
         books_repo.insert_books(books_transformed)
 

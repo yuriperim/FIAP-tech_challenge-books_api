@@ -32,3 +32,6 @@ class DBConnectionHandler(IDBConnectionHandler):
             self.__engine.dispose()
             self.__engine = None
             self.session = None
+
+    def is_connected(self) -> bool:
+        return self.__engine is not None

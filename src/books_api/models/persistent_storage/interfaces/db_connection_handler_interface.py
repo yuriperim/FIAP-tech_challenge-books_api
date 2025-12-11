@@ -9,3 +9,7 @@ class IDBConnectionHandler(ABC):
     @abstractmethod
     def disconnect(self) -> None:
         pass
+
+    @abstractmethod
+    def is_connected(self) -> bool:
+        pass
