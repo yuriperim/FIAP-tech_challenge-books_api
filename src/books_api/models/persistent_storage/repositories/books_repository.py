@@ -61,7 +61,7 @@ class BooksRepository(IBooksRepository):
                 db.session.rollback()
                 raise e
 
-    def select_book(self, book_id: int) -> BooksTable | None:
+    def select_book_by_id(self, book_id: int) -> BooksTable | None:
         with self.__db_connection as db:
             try:
                 book = db.session.query(BooksTable).filter(BooksTable.book_id == book_id).one()

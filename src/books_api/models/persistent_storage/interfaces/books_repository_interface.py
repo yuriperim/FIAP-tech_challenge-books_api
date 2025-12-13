@@ -27,7 +27,7 @@ class IBooksRepository(ABC):
         pass
 
     @abstractmethod
-    def select_book(self, book_id: int) -> BooksTable | None:
+    def select_book_by_id(self, book_id: int) -> BooksTable | None:
         pass
 
     @abstractmethod
