@@ -70,6 +70,21 @@ class BooksRepository(IBooksRepository):
 
             return book
 
+    def select_books_by_title_or_category(self, titulo: str | None, categoria: str | None) -> list[BooksTable]:
+        conditions = []
+        if titulo is not None:
+            conditions.append(BooksTable.titulo.ilike(f"%{titulo}%"))
+        if categoria is not None:
+            conditions.append(BooksTable.categoria == categoria)
+
+        with self.__db_connection as db:
+            try:
+                books = db.session.query(BooksTable).filter(*conditions).all()
+            except NoResultFound:
+                books = []
+
+            return books
+
     def select_books(self) -> list[BooksTable]:
         with self.__db_connection as db:
             try:
