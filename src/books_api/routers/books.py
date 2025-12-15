@@ -40,3 +40,10 @@ async def get_book_by_id(book_id: int, books_repo: BooksRepository = Depends(get
     book = books_repo.select_book_by_id(book_id)
 
     return book.to_dict() if book is not None else {}
+
+
+@router.get("/categories", response_model=dict)
+async def get_categories(books_repo: BooksRepository = Depends(get_books_repo)) -> dict:
+    categories = books_repo.select_categories()
+
+    return {"categorias": categories}

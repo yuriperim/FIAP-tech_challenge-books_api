@@ -93,3 +93,14 @@ class BooksRepository(IBooksRepository):
                 books = []
 
             return books
+
+    def select_categories(self) -> list[str]:
+        with self.__db_connection as db:
+            try:
+                categories_tuples = db.session.query(BooksTable.categoria).distinct().all()
+            except NoResultFound:
+                categories = []
+            else:
+                categories = [category_tuple[0] for category_tuple in categories_tuples]
+
+            return categories
