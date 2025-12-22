@@ -1,5 +1,6 @@
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, select
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.exc import OperationalError
 
 from src.books_api.models.persistent_storage.interfaces.db_connection_handler_interface import IDBConnectionHandler
 from src.books_api.models.persistent_storage.settings import DATABASE_URL  # DATABASE_URL definido em __init__.py
@@ -34,4 +35,14 @@ class DBConnectionHandler(IDBConnectionHandler):
             self.session = None
 
     def is_connected(self) -> bool:
-        return self.__engine is not None
+        with self as db:
+            try:
+                _ = db.session.execute(select(1))
+            except OperationalError:
+                is_connected = False
+            except Exception:
+                raise
+            else:
+                is_connected = True
+
+            return is_connected

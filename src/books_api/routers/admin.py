@@ -33,3 +33,14 @@ async def run_books_etl(
     background_tasks.add_task(run_etl, books_repo)
 
     return {"message": "Scraping iniciado"}
+
+
+@router.get("/health")
+async def run_health_check(books_repo: BooksRepository = Depends(get_books_repo)) -> dict:
+    conn = books_repo.get_db_connection()
+    if conn.is_connected():
+        message = "Conexão com BD estabelecida."
+    else:
+        message = "Conexão com BD não estabelecida."
+
+    return {"message": message}
