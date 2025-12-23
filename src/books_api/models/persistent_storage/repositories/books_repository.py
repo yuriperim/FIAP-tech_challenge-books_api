@@ -85,6 +85,17 @@ class BooksRepository(IBooksRepository):
 
             return books
 
+    def select_books_by_price_range(self, min_price: float, max_price: float) -> list[BooksTable]:
+        condition = BooksTable.preco.between(min_price, max_price)
+
+        with self.__db_connection as db:
+            try:
+                books = db.session.query(BooksTable).filter(condition).all()
+            except NoResultFound:
+                books = []
+
+            return books
+
     def select_books(self) -> list[BooksTable]:
         with self.__db_connection as db:
             try:

@@ -35,6 +35,17 @@ async def get_books_by_title_or_category(
     return [book.to_dict() for book in books]
 
 
+@router.get("/books/price-range", response_model=list[dict])
+async def get_books_by_price_range(
+    min_price: Annotated[float, Query(alias="min")],
+    max_price: Annotated[float, Query(alias="max")],
+    books_repo: BooksRepository = Depends(get_books_repo)
+) -> list[dict]:
+    books = books_repo.select_books_by_price_range(min_price, max_price)
+
+    return [book.to_dict() for book in books]
+
+
 @router.get("/books/{book_id}", response_model=dict)
 async def get_book_by_id(book_id: int, books_repo: BooksRepository = Depends(get_books_repo)) -> dict:
     book = books_repo.select_book_by_id(book_id)
