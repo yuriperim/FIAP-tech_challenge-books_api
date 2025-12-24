@@ -24,6 +24,13 @@ async def get_books(books_repo: BooksRepository = Depends(get_books_repo)) -> li
     return [book.to_dict() for book in books]
 
 
+@router.get("/books/top-rated", response_model=list[dict])
+async def get_top_rated_books(books_repo: BooksRepository = Depends(get_books_repo)) -> list[dict]:
+    books = books_repo.select_books_by_rating(rating=5)
+
+    return [book.to_dict() for book in books]
+
+
 @router.get("/books/search", response_model=list[dict])
 async def get_books_by_title_or_category(
     title: Annotated[str | None, Query(max_length=250)] = None,
