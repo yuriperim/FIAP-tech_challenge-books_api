@@ -31,5 +31,21 @@ class IBooksRepository(ABC):
         pass
 
     @abstractmethod
+    def select_books_by_title_or_category(self, titulo: str | None, categoria: str | None) -> list[BooksTable]:
+        pass
+
+    @abstractmethod
+    def select_books_by_rating(self, rating: int) -> list[BooksTable]:
+        pass
+
+    @abstractmethod
+    def select_books_by_price_range(self, min_price: float, max_price: float) -> list[BooksTable]:
+        pass
+
+    @abstractmethod
     def select_books(self) -> list[BooksTable]:
+        pass
+
+    @abstractmethod
+    def select_categories(self) -> list[str]:
         pass
