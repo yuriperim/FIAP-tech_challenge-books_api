@@ -65,7 +65,7 @@ async def get_book_by_id(book_id: int, books_repo: BooksRepository = Depends(get
 async def get_categories(books_repo: BooksRepository = Depends(get_books_repo)) -> dict:
     categories = books_repo.select_categories()
 
-    return {"categorias": categories}
+    return {"categorias": sorted(categories)}
 
 
 @router.get("/stats/overview", response_model=dict)
