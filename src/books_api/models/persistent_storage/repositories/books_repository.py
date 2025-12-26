@@ -1,3 +1,4 @@
+from sqlalchemy import func
 from sqlalchemy.orm.exc import NoResultFound
 
 from src.books_api.models.persistent_storage.interfaces.db_connection_handler_interface import IDBConnectionHandler
@@ -41,17 +42,15 @@ class BooksRepository(IBooksRepository):
                 raise e
 
     def insert_books(self, books_raw: list[dict]) -> None:
-        books = [
-            BooksTable(
-                book_id=book["book_id"],
-                titulo=book["titulo"],
-                preco=book["preco"],
-                rating=book["rating"],
-                disponibilidade=book["disponibilidade"],
-                categoria=book["categoria"],
-                url_imagem=book["url_imagem"],
-            ) for book in books_raw
-        ]
+        books = [BooksTable(
+            book_id=book["book_id"],
+            titulo=book["titulo"],
+            preco=book["preco"],
+            rating=book["rating"],
+            disponibilidade=book["disponibilidade"],
+            categoria=book["categoria"],
+            url_imagem=book["url_imagem"],
+        ) for book in books_raw]
 
         with self.__db_connection as db:
             try:
@@ -121,8 +120,30 @@ class BooksRepository(IBooksRepository):
             try:
                 categories_tuples = db.session.query(BooksTable.categoria).distinct().all()
             except NoResultFound:
-                categories = []
-            else:
-                categories = [category_tuple[0] for category_tuple in categories_tuples]
+                categories_tuples = []
 
-            return categories
+            return [category_tuple[0] for category_tuple in categories_tuples]
+
+    def aggregate_by_column(self, column_name: str) -> list[dict]:
+        column = getattr(BooksTable, column_name)
+
+        with self.__db_connection as db:
+            try:
+                aggregation_tuples = (
+                    db.session
+                    .query(
+                        column,
+                        func.count(BooksTable.book_id),
+                        func.sum(BooksTable.preco),
+                    )
+                    .group_by(column)
+                    .all()
+                )
+            except NoResultFound:
+                aggregation_tuples = []
+
+            return [{
+                "valor": aggregation_tuple[0],
+                "quantidade": aggregation_tuple[1],
+                "soma_preco": aggregation_tuple[2],
+            } for aggregation_tuple in aggregation_tuples]

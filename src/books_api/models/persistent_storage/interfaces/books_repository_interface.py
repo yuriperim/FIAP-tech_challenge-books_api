@@ -49,3 +49,7 @@ class IBooksRepository(ABC):
     @abstractmethod
     def select_categories(self) -> list[str]:
         pass
+
+    @abstractmethod
+    def aggregate_by_column(self, column_name: str) -> list[dict]:
+        pass
