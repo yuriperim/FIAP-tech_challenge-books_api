@@ -1,7 +1,9 @@
 import re
+import asyncio
 import requests
 from requests.exceptions import HTTPError
-from bs4 import BeautifulSoup
+import httpx
+from bs4 import BeautifulSoup, Tag
 
 from src.books_api.models.persistent_storage.interfaces.books_repository_interface import IBooksRepository
 
@@ -9,7 +11,32 @@ from src.books_api.models.persistent_storage.interfaces.books_repository_interfa
 BASE_URL = "https://books.toscrape.com"
 
 
-def extract_books() -> list[dict]:
+async def fetch_book(httpx_async_client: httpx.AsyncClient, book_info: Tag) -> dict:
+    book_id = book_info.find("h3").find("a").get("href")
+    book_title = book_info.find("h3").find("a").get("title")
+    book_price = book_info.select_one(".product_price .price_color").text
+    book_rating = book_info.select_one(".star-rating").get("class")[1]
+    book_image = book_info.find(class_="image_container").find("img").get("src")
+
+    book_url = f'{BASE_URL}/catalogue/{book_id}'
+    book_response = await httpx_async_client.get(book_url)
+    book_html = BeautifulSoup(book_response.text, "lxml")
+
+    book_availability = book_html.select_one(".availability").text
+    book_category = book_html.find("ul", class_="breadcrumb").find_all("li")[2].find("a").text
+
+    return {
+        "book_id": book_id,
+        "book_title": book_title,
+        "book_price": book_price,
+        "book_rating": book_rating,
+        "book_image": book_image,
+        "book_availability": book_availability,
+        "book_category": book_category,
+    }
+
+
+async def extract_books() -> list[dict]:
     books_raw = []
 
     CONTINUE = True
@@ -25,29 +52,10 @@ def extract_books() -> list[dict]:
             books_html = BeautifulSoup(books_response.text, "lxml")
 
             books_info = books_html.find_all("article", class_="product_pod")
-            for book_info in books_info:
-                book_id = book_info.find("h3").find("a").get("href")
-                book_title = book_info.find("h3").find("a").get("title")
-                book_price = book_info.select_one(".product_price .price_color").text
-                book_rating = book_info.select_one(".star-rating").get("class")[1]
-                book_image = book_info.find(class_="image_container").find("img").get("src")
-
-                book_url = f'{BASE_URL}/catalogue/{book_id}'
-                book_response = requests.get(book_url)
-                book_html = BeautifulSoup(book_response.text, "lxml")
-
-                book_availability = book_html.select_one(".availability").text
-                book_category = book_html.find("ul", class_="breadcrumb").find_all("li")[2].find("a").text
-
-                books_raw.append({
-                    "book_id": book_id,
-                    "book_title": book_title,
-                    "book_price": book_price,
-                    "book_rating": book_rating,
-                    "book_image": book_image,
-                    "book_availability": book_availability,
-                    "book_category": book_category,
-                })
+            async with httpx.AsyncClient() as client:
+                tasks = [fetch_book(client, book_info) for book_info in books_info]
+                books_raw_current_page = await asyncio.gather(*tasks)
+                books_raw.extend(books_raw_current_page)
 
             # next_page = books_html.find(class_="pager").find(class_="next")
             next_page = books_html.select_one(".pager .next")
@@ -109,8 +117,8 @@ def load_books(books_repo: IBooksRepository, books_transformed: list[dict], dry_
         books_repo.insert_books(books_transformed)
 
 
-def run_etl(books_repo: IBooksRepository, dry_run: bool = False) -> None:
-    books_raw = extract_books()
+async def run_etl(books_repo: IBooksRepository, dry_run: bool = False) -> None:
+    books_raw = await extract_books()
     books_transformed = transform_books(books_raw)
     books_transformed.sort(key=lambda x: x["book_id"])
     load_books(books_repo, books_transformed, dry_run=dry_run)
