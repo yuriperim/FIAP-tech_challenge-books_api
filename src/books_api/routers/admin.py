@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, BackgroundTasks
 
 from src.books_api.models.persistent_storage.settings.db_connection_handler import DBConnectionHandler
 from src.books_api.models.persistent_storage.repositories.books_repository import BooksRepository
-from src.books_api.services.migrations import alembic_upgrade
+from src.books_api.services.migrations import alembic_upgrade, alembic_downgrade
 from src.books_api.services.books_etl import run_etl
 
 
@@ -18,14 +18,21 @@ def get_books_repo() -> BooksRepository:
     return BooksRepository(db_connection)
 
 
-@router.post("/migrations")
-async def run_migrations(background_tasks: BackgroundTasks) -> dict:
+@router.post("/migrations/up")
+async def run_migrations_up(background_tasks: BackgroundTasks) -> dict:
     background_tasks.add_task(alembic_upgrade)
 
     return {"message": "Atualização BD iniciada"}
 
 
-# @router.post("/scraping/trigger")
+@router.post("/migrations/down")
+async def run_migrations_down(background_tasks: BackgroundTasks) -> dict:
+    background_tasks.add_task(alembic_downgrade)
+
+    return {"message": "Regressão BD iniciada"}
+
+
+@router.post("/scraping/trigger")
 async def run_books_etl(
     background_tasks: BackgroundTasks,
     books_repo: BooksRepository = Depends(get_books_repo)
