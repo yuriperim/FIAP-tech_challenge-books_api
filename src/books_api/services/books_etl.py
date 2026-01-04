@@ -112,4 +112,5 @@ def load_books(books_repo: IBooksRepository, books_transformed: list[dict], dry_
 def run_etl(books_repo: IBooksRepository, dry_run: bool = False) -> None:
     books_raw = extract_books()
     books_transformed = transform_books(books_raw)
+    books_transformed.sort(key=lambda x: x["book_id"])
     load_books(books_repo, books_transformed, dry_run=dry_run)
