@@ -6,14 +6,12 @@ Create Date: 2026-01-10 16:21:30.387163
 
 """
 
-import os
-from pathlib import Path
-from dotenv import load_dotenv
 from typing import Sequence, Union
 
 import sqlalchemy as sa
 from alembic import op
 
+from src.books_api.configs.user_config import admin_user
 from src.books_api.services.encryption import hash_password
 
 
@@ -22,9 +20,6 @@ revision: str = "5cb91408cfa5"
 down_revision: Union[str, Sequence[str], None] = "58caed9c6fde"
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
-
-BASE_DIR = Path(__file__).resolve().parents[4]
-load_dotenv(dotenv_path=BASE_DIR.joinpath(".env.development"))
 
 
 def upgrade() -> None:
@@ -37,8 +32,8 @@ def upgrade() -> None:
     )
 
     # em produção, variáveis homônimas do SO têm precedência
-    username = os.getenv("ADMIN_USER")
-    password = os.getenv("ADMIN_PASSWORD")
+    username = admin_user.username
+    password = admin_user.password
 
     hashed_password = hash_password(password)
 

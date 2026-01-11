@@ -5,7 +5,7 @@ from sqlalchemy import pool
 
 from alembic import context
 
-from src.books_api.models.persistent_storage.settings import DATABASE_URL
+from src.books_api.models.persistent_storage.settings.db_connection_handler import DATABASE_URL
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

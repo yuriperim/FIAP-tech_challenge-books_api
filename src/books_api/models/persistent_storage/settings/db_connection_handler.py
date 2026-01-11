@@ -2,8 +2,11 @@ from sqlalchemy import create_engine, select
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import OperationalError
 
+from src.books_api.configs.db_config import db
 from src.books_api.models.persistent_storage.interfaces.db_connection_handler_interface import IDBConnectionHandler
-from src.books_api.models.persistent_storage.settings import DATABASE_URL  # DATABASE_URL definido em __init__.py
+
+
+DATABASE_URL = f"postgresql+psycopg://{db.user}:{db.password}@{db.host}:{db.port}/{db.name}"
 
 
 class DBConnectionHandler(IDBConnectionHandler):
