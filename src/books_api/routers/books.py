@@ -2,8 +2,8 @@ from decimal import Decimal
 from typing import Annotated
 from fastapi import APIRouter, Depends, Query
 
-from src.books_api.models.persistent_storage.settings.db_connection_handler import DBConnectionHandler
-from src.books_api.models.persistent_storage.repositories.books_repository import BooksRepository
+from src.books_api.models.persistent_storage.interfaces.books_repository_interface import IBooksRepository
+from src.books_api.routers.dependencies import get_books_repo
 
 
 router = APIRouter(
@@ -12,21 +12,15 @@ router = APIRouter(
 )
 
 
-def get_books_repo() -> BooksRepository:
-    db_connection = DBConnectionHandler()
-
-    return BooksRepository(db_connection)
-
-
 @router.get("/books", response_model=list[dict])
-async def get_books(books_repo: BooksRepository = Depends(get_books_repo)) -> list[dict]:
+async def get_books(books_repo: IBooksRepository = Depends(get_books_repo)) -> list[dict]:
     books = books_repo.select_books()
 
     return [book.to_dict() for book in books]
 
 
 @router.get("/books/top-rated", response_model=list[dict])
-async def get_top_rated_books(books_repo: BooksRepository = Depends(get_books_repo)) -> list[dict]:
+async def get_top_rated_books(books_repo: IBooksRepository = Depends(get_books_repo)) -> list[dict]:
     books = books_repo.select_books_by_rating(rating=5)
 
     return [book.to_dict() for book in books]
@@ -36,7 +30,7 @@ async def get_top_rated_books(books_repo: BooksRepository = Depends(get_books_re
 async def get_books_by_title_or_category(
     title: Annotated[str | None, Query(max_length=250)] = None,
     category: Annotated[str | None, Query(max_length=25)] = None,
-    books_repo: BooksRepository = Depends(get_books_repo)
+    books_repo: IBooksRepository = Depends(get_books_repo)
 ) -> list[dict]:
     books = books_repo.select_books_by_title_or_category(title, category)
 
@@ -47,7 +41,7 @@ async def get_books_by_title_or_category(
 async def get_books_by_price_range(
     min_price: Annotated[float, Query(alias="min")],
     max_price: Annotated[float, Query(alias="max")],
-    books_repo: BooksRepository = Depends(get_books_repo)
+    books_repo: IBooksRepository = Depends(get_books_repo)
 ) -> list[dict]:
     books = books_repo.select_books_by_price_range(min_price, max_price)
 
@@ -55,21 +49,21 @@ async def get_books_by_price_range(
 
 
 @router.get("/books/{book_id}", response_model=dict)
-async def get_book_by_id(book_id: int, books_repo: BooksRepository = Depends(get_books_repo)) -> dict:
+async def get_book_by_id(book_id: int, books_repo: IBooksRepository = Depends(get_books_repo)) -> dict:
     book = books_repo.select_book_by_id(book_id)
 
     return book.to_dict() if book is not None else {}
 
 
 @router.get("/categories", response_model=dict)
-async def get_categories(books_repo: BooksRepository = Depends(get_books_repo)) -> dict:
+async def get_categories(books_repo: IBooksRepository = Depends(get_books_repo)) -> dict:
     categories = books_repo.select_categories()
 
     return {"categorias": sorted(categories)}
 
 
 @router.get("/stats/overview", response_model=dict)
-async def get_stats_overview(books_repo: BooksRepository = Depends(get_books_repo)) -> dict:
+async def get_stats_overview(books_repo: IBooksRepository = Depends(get_books_repo)) -> dict:
     distribuicao_ratings = books_repo.aggregate_by_column("rating")
 
     total_livros = 0
@@ -91,7 +85,7 @@ async def get_stats_overview(books_repo: BooksRepository = Depends(get_books_rep
 
 
 @router.get("/stats/categories", response_model=list[dict])
-async def get_categories_stats(books_repo: BooksRepository = Depends(get_books_repo)) -> list[dict]:
+async def get_categories_stats(books_repo: IBooksRepository = Depends(get_books_repo)) -> list[dict]:
     distribuicao_categorias = books_repo.aggregate_by_column("categoria")
 
     for categoria_info in distribuicao_categorias:
