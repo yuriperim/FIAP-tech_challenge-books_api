@@ -115,6 +115,15 @@ class BooksRepository(IBooksRepository):
 
             return books
 
+    def delete_books(self) -> None:
+        with self.__db_connection as db:
+            try:
+                db.session.query(BooksTable).delete()
+                db.session.commit()
+            except Exception as e:
+                db.session.rollback()
+                raise e
+
     def select_categories(self) -> list[str]:
         with self.__db_connection as db:
             try:

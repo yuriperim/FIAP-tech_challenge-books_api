@@ -3,7 +3,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Query
 
 from src.books_api.models.persistent_storage.interfaces.books_repository_interface import IBooksRepository
-from src.books_api.routers.dependencies import get_books_repo
+from src.books_api.routers.dependencies import get_books_repo, get_user
 
 
 router = APIRouter(
@@ -17,6 +17,19 @@ async def get_books(books_repo: IBooksRepository = Depends(get_books_repo)) -> l
     books = books_repo.select_books()
 
     return [book.to_dict() for book in books]
+
+
+@router.delete("/books", response_model=dict)
+async def delete_books(
+    username: str = Depends(get_user),
+    books_repo: IBooksRepository = Depends(get_books_repo)
+) -> dict:
+    books_repo.delete_books()
+
+    return {
+        "message": "Registros excluídos da tabela de livros",
+        "requester": username,
+    }
 
 
 @router.get("/books/top-rated", response_model=list[dict])

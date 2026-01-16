@@ -47,6 +47,10 @@ class IBooksRepository(ABC):
         pass
 
     @abstractmethod
+    def delete_books(self) -> None:
+        pass
+
+    @abstractmethod
     def select_categories(self) -> list[str]:
         pass
 
