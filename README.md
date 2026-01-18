@@ -58,6 +58,6 @@ Obs.: para derrubar a aplicação, apertar `Ctrl + C`; para derrubar o banco de 
   - services — camada com serviço de ETL, e funções utilitárias para hashing de senhas e geração/decodificação de JWT
   - routers — definição dos endpoint da API, separados em _admin_ e _books_
 
-Other important files
+Outros arquivos importantes
 - pyproject.toml — arquivo de dependências
 - compose.yaml — arquivo para subida de uma instância postgres, já com volume configurado
