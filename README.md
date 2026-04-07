@@ -1,6 +1,6 @@
 # Books API — Tech Challenge
 
-Este projeto foi desenvolvido como proposta de solução ao Tech Challenge, especificamente ao desafio da 1ª Fase da Pós Tech em Machine Learning Engineering. O desafio consite em raspar os dados do site [Books to Scrape](https://books.toscrape.com/) e disponibilizar esses dados para interação via API.
+Este projeto foi desenvolvido como proposta de solução ao Tech Challenge, especificamente ao desafio da 1ª Fase da Pós Tech em Machine Learning Engineering. O desafio consiste em raspar os dados do site [Books to Scrape](https://books.toscrape.com/) e disponibilizar esses dados para interação via API.
 
 ## Arquitetura
 
